@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Preisentes</title>
+    </head>
+    <body>
+        <header th:replace="layout/template :: header"/>
+
+        <!--
+        th:href="@{/president/create}":
+            Hace referencia al controlador/método. Por ende
+            en el controlador PresidentController, debe existir
+            un método @GetMapping /create que cargue una vista.
+        -->
+        <a th:href="@{/president/create}">Agregar presidente</a>
+
+        <table border="1">
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Año</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+
+            <tr th:each="president : ${presidents}">
+                <td th:text="${president.id}"></td>
+                <td th:text="${president.name}"></td>
+                <td th:text="${president.year}"></td>
+                <td>
+                    <a th:href="@{/president/edit/} + ${president.id}">Editar</a>
+                </td>
+                <td>
+                    <a th:href="@{/president/delete/} + ${president.id}">Eliminar</a>
+                </td>
+            </tr>
+        </table>
+
+        <header th:replace="layout/template :: footer"/>
+    </body>
+</html>

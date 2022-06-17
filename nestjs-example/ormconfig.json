@@ -1,0 +1,10 @@
+{
+    "type": "mysql",
+    "host": "db9.awto.pro",
+    "port": 3306,
+    "username": "root",
+    "password": "Mlf9Ey8gfPxtiQ==",
+    "database": "awto",
+    "entities": ["dist/**/*.entity{.ts,.js}"],
+    "synchronize": false
+}

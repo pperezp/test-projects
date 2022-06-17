@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Preisentes</title>
+    </head>
+    <body>
+        <header th:replace="layout/template :: header"/>
+
+        <a th:href="@{/president}">Volver</a>
+
+        <!--
+        th:action="@{/president/save}"  :
+            controlador/método, por ende debe
+            haber un método @PostMapping /save
+            en el controlador.
+
+        th:object="${president}:
+            Este objeto es el que se va a utilizar para enviar
+            los datos al controlador para que se pueda crear un
+            presidente en la base de datos. Este objeto se declara
+            en el controlador PresidentController, específicamente
+            en el método @GetMapping /create. Se declara como parámetro
+            de ese método.
+
+        th:field="*{name}":
+        th:field="*{year}":
+            De esta manera uno los atributos de la clase java, con
+            el formulario. De esa forma los datos ingresados en el
+            formulario quedan automáticamente en el objeto java que
+            se le pasará a @PostMapping /save.
+        -->
+        <form th:action="@{/president/save}" method="post" th:object="${president}">
+            <input type="hidden" name="id" th:field="*{id}"/>
+
+            <label for="name">Nombre: </label>
+            <input type="text" id="name" name="name" th:field="*{name}"/>
+
+            <label for="year">Año: </label>
+            <input type="number" id="year" name="year" th:field="*{year}"/>
+
+            <input type="submit" value="Almacenar"/>
+        </form>
+
+        <header th:replace="layout/template :: footer"/>
+    </body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+        <script src="mqttws31.min.js" ></script>
+    </head>
+
+    <body>
+        <hr>
+
+        <input type="text" id="broker" value="test.mosquitto.org" placeholder="Broker: ">
+        <input type="text" id="port" value="8080" placeholder="Port: "><br>
+        <input type="text" id="topic" value="/prez19" placeholder="Topic: ">
+        <input type="button" value="Conectar" id="btnConectar">
+        <input type="button" value="Desconectar" id="btnDisconnect">
+
+        <hr>
+
+        <input type="text" id="message" placeholder="Mensaje: ">
+        <input type="button" id="btnSend" value="Enviar">
+
+        <hr>
+
+        <ul id="chat"></ul>
+
+        <script>
+            var btnSend = document.getElementById("btnSend");
+            var btnConnect = document.getElementById("btnConectar");
+            var btnDisconnect = document.getElementById("btnDisconnect");
+
+            btnDisconnect.disabled = true;
+            btnSend.disabled = true;
+
+            btnSend.addEventListener("click", function(){
+                var message = document.getElementById("message");
+                msg = message.value;
+                sendMessage(msg);
+            });
+
+            btnConnect.addEventListener("click", function(){
+                btnConnect.disabled = true;
+                connect();
+            });
+
+            btnDisconnect.addEventListener("click", function(){
+                client.disconnect();
+
+                document.getElementById("chat").innerHTML = "";
+
+                btnConnect.disabled = false;
+                btnDisconnect.disabled = true;
+                btnSend.disabled = true;
+            });
+        </script>
+
+        
+
+        <script>
+            var wsbroker;
+            var wsport;
+            var topic;
+            var client;
+
+            function connect() {
+                wsbroker = document.getElementById("broker").value;  
+                wsport = document.getElementById("port").value; // Porque es sobre WebSocket
+                topic = document.getElementById("topic").value;
+
+                client = new Paho.MQTT.Client(
+                    wsbroker, 
+                    parseInt(wsport),
+                    "clientId_" + parseInt(Math.random() * 100, 10)
+                );
+
+                client.onConnectionLost = function (responseObject) {
+                    console.log("connection lost: " + responseObject.errorMessage);
+                };
+
+                client.onMessageArrived = function (message) {
+                    console.log(message.destinationName, ' -- ', message.payloadString);
+                    addMessageToChat(message.destinationName+": "+message.payloadString);
+                };
+
+                var options = {
+                    timeout: 3,
+                    onSuccess: function () {
+                        console.log("mqtt connected");
+
+                        btnConnect.disabled = true;
+                        btnDisconnect.disabled = false;
+                        btnSend.disabled = false;
+
+                        client.subscribe(topic, {qos: 1});
+                        sendMessage("Hola!");
+                    },
+                    onFailure: function (message) {
+                        console.log("Connection failed: " + message.errorMessage);
+
+                        btnConnect.disabled = false;
+                        btnDisconnect.disabled = true;
+                        btnSend.disabled = true;
+                    }
+                };
+                client.connect(options);
+            }
+
+            function sendMessage(msg){
+                message = new Paho.MQTT.Message(msg);
+                message.destinationName = topic;
+
+                client.send(message);
+            }
+
+            function addMessageToChat(message){
+                var chatTag = document.getElementById("chat");
+                var messageTag = document.createElement("li");
+                var textNode = document.createTextNode(message);
+
+                messageTag.appendChild(textNode);
+                chatTag.appendChild(messageTag);
+            }
+        </script>
+    </body>
+</html>
